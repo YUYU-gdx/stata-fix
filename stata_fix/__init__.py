@@ -1,0 +1,2 @@
+"""Local Stata MCP helpers."""
+

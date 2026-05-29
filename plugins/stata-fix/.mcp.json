@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "stata_fix": {
+      "command": "uvx",
+      "args": ["--from", "stata-fix", "stata-fix-mcp"]
+    }
+  }
+}
