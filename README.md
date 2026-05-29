@@ -103,7 +103,9 @@ Do not hardcode a developer's local repository path in shared configuration. Use
 4. Restart the MCP client.
 5. Ask the assistant to run `stata_detect`.
 
-On Windows, the best default experience uses Stata Automation COM. If Stata is found but COM is not registered, the MCP server first attempts to run Stata's `/Register` step automatically. If `stata_detect` still reports `backend="pystata"` even though Stata is installed, register Stata Automation COM once from an elevated PowerShell:
+On Windows, the best default experience uses Stata Automation COM. If Stata is found but COM is not registered, the MCP server first attempts to run Stata's `/Register` step automatically, but only when no Stata process is already running. If a user is actively using Stata, the server will not auto-register in order to avoid disrupting that session.
+
+If `stata_detect` still reports `backend="pystata"` even though Stata is installed, close Stata and register Stata Automation COM once from an elevated PowerShell:
 
 ```powershell
 Start-Process -FilePath "<path-to-StataMP-64.exe>" -ArgumentList "/Register" -Verb RunAs -Wait

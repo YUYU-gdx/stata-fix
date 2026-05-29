@@ -76,6 +76,7 @@ def test_create_runner_registers_stata_com_before_falling_back(monkeypatch, tmp_
 
     monkeypatch.setattr("stata_fix.mcp_server.os.name", "nt")
     monkeypatch.setattr("stata_fix.mcp_server.is_com_available", lambda: len(calls) > 0)
+    monkeypatch.setattr("stata_fix.mcp_server.is_stata_process_running", lambda: False)
     monkeypatch.setattr("stata_fix.mcp_server.register_stata_com", lambda installation: calls.append(installation) or True)
 
     runner = create_runner(install)
@@ -94,11 +95,32 @@ def test_create_runner_falls_back_to_pystata_when_registration_fails(monkeypatch
 
     monkeypatch.setattr("stata_fix.mcp_server.os.name", "nt")
     monkeypatch.setattr("stata_fix.mcp_server.is_com_available", lambda: False)
+    monkeypatch.setattr("stata_fix.mcp_server.is_stata_process_running", lambda: False)
     monkeypatch.setattr("stata_fix.mcp_server.register_stata_com", lambda installation: False)
 
     runner = create_runner(install)
 
     assert runner.backend == "pystata"
+
+
+def test_create_runner_skips_registration_when_stata_is_running(monkeypatch, tmp_path):
+    install = StataInstallation(
+        binary=tmp_path / "StataMP-64.exe",
+        root=tmp_path,
+        edition="mp",
+        diagnostics="",
+    )
+    calls = []
+
+    monkeypatch.setattr("stata_fix.mcp_server.os.name", "nt")
+    monkeypatch.setattr("stata_fix.mcp_server.is_com_available", lambda: False)
+    monkeypatch.setattr("stata_fix.mcp_server.is_stata_process_running", lambda: True)
+    monkeypatch.setattr("stata_fix.mcp_server.register_stata_com", lambda installation: calls.append(installation) or True)
+
+    runner = create_runner(install)
+
+    assert runner.backend == "pystata"
+    assert calls == []
 
 
 def test_stata_attach_existing_switches_cached_runner_to_existing_gui(monkeypatch, tmp_path):

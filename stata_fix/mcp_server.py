@@ -28,9 +28,27 @@ def create_runner(installation, *, attach_existing: bool = False):
     if os.name == "nt":
         if is_com_available():
             return ComStataRunner(installation, attach_existing=attach_existing)
-        if register_stata_com(installation) and is_com_available():
+        if not is_stata_process_running() and register_stata_com(installation) and is_com_available():
             return ComStataRunner(installation, attach_existing=attach_existing)
     return PyStataRunner(installation)
+
+
+def is_stata_process_running() -> bool:
+    if os.name != "nt":
+        return False
+    try:
+        completed = subprocess.run(
+            ["tasklist", "/FI", "IMAGENAME eq Stata*"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except Exception:
+        return True
+
+    output = completed.stdout.lower()
+    return "stata" in output and "no tasks" not in output
 
 
 def register_stata_com(installation) -> bool:
