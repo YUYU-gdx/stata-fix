@@ -47,10 +47,10 @@ plugins/stata-fix
 The plugin bundles:
 
 - `skills/stata/SKILL.md`
-- `.mcp.json`, which launches `uvx --from stata-fix stata-fix-mcp`
+- `.mcp.json`, which launches `uvx --from git+https://github.com/YUYU-gdx/stata-fix.git stata-fix-mcp`
 - `.codex-plugin/plugin.json`
 
-After `stata-fix` is published as a Python package, Codex users can install the plugin from the repository path:
+Codex users can install the plugin from the repository path:
 
 ```powershell
 npx codex-marketplace add <owner>/<repo>/plugins/stata-fix --plugin

@@ -20,7 +20,7 @@ def test_codex_plugin_mcp_launches_published_console_script():
     server = config["mcpServers"]["stata_fix"]
     assert server == {
         "command": "uvx",
-        "args": ["--from", "stata-fix", "stata-fix-mcp"],
+        "args": ["--from", "git+https://github.com/YUYU-gdx/stata-fix.git", "stata-fix-mcp"],
     }
 
 

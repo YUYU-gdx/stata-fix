@@ -2,7 +2,7 @@
   "mcpServers": {
     "stata_fix": {
       "command": "uvx",
-      "args": ["--from", "stata-fix", "stata-fix-mcp"]
+      "args": ["--from", "git+https://github.com/YUYU-gdx/stata-fix.git", "stata-fix-mcp"]
     }
   }
 }
