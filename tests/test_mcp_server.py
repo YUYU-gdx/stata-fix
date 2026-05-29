@@ -35,6 +35,7 @@ def test_stata_detect_returns_discovered_installation(monkeypatch, tmp_path):
         lambda: StataInstallation(binary=binary, root=tmp_path, edition="mp", diagnostics=""),
     )
     monkeypatch.setattr("stata_fix.mcp_server.is_com_available", lambda: True)
+    monkeypatch.setattr("stata_fix.mcp_server.runtime_dir", lambda: tmp_path / ".stata-fix")
 
     result = asyncio.run(stata_detect())
 
@@ -44,6 +45,7 @@ def test_stata_detect_returns_discovered_installation(monkeypatch, tmp_path):
         "root": str(tmp_path),
         "edition": "mp",
         "backend": "com",
+        "runtime_dir": str(tmp_path / ".stata-fix"),
         "diagnostics": "",
     }
 
@@ -61,6 +63,42 @@ def test_create_runner_defaults_to_com_on_windows_when_available(monkeypatch, tm
     runner = create_runner(install)
 
     assert isinstance(runner, ComStataRunner)
+
+
+def test_create_runner_registers_stata_com_before_falling_back(monkeypatch, tmp_path):
+    install = StataInstallation(
+        binary=tmp_path / "StataMP-64.exe",
+        root=tmp_path,
+        edition="mp",
+        diagnostics="",
+    )
+    calls = []
+
+    monkeypatch.setattr("stata_fix.mcp_server.os.name", "nt")
+    monkeypatch.setattr("stata_fix.mcp_server.is_com_available", lambda: len(calls) > 0)
+    monkeypatch.setattr("stata_fix.mcp_server.register_stata_com", lambda installation: calls.append(installation) or True)
+
+    runner = create_runner(install)
+
+    assert isinstance(runner, ComStataRunner)
+    assert calls == [install]
+
+
+def test_create_runner_falls_back_to_pystata_when_registration_fails(monkeypatch, tmp_path):
+    install = StataInstallation(
+        binary=tmp_path / "StataMP-64.exe",
+        root=tmp_path,
+        edition="mp",
+        diagnostics="",
+    )
+
+    monkeypatch.setattr("stata_fix.mcp_server.os.name", "nt")
+    monkeypatch.setattr("stata_fix.mcp_server.is_com_available", lambda: False)
+    monkeypatch.setattr("stata_fix.mcp_server.register_stata_com", lambda installation: False)
+
+    runner = create_runner(install)
+
+    assert runner.backend == "pystata"
 
 
 def test_stata_attach_existing_switches_cached_runner_to_existing_gui(monkeypatch, tmp_path):

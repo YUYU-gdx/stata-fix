@@ -1,6 +1,6 @@
 {
   "name": "stata-fix",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "display_name": "Stata Fix",
   "description": "Run local Stata from Codex with a bundled skill and MCP server.",
   "author": "stata-fix contributors",

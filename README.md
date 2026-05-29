@@ -3,6 +3,7 @@
 `stata-fix` is an MCP server for running local Stata code.
 It is designed to work without asking users to hand-write a Stata install path.
 On Windows, it defaults to controlling a separate Stata GUI through Stata Automation COM when available.
+Temporary do-files and logs are written under the MCP process working directory in `.stata-fix` by default.
 
 ## Install
 
@@ -102,13 +103,21 @@ Do not hardcode a developer's local repository path in shared configuration. Use
 4. Restart the MCP client.
 5. Ask the assistant to run `stata_detect`.
 
-On Windows, the best default experience uses Stata Automation COM. If `stata_detect` reports `backend="pystata"` even though Stata is installed, register Stata Automation COM once from an elevated PowerShell:
+On Windows, the best default experience uses Stata Automation COM. If Stata is found but COM is not registered, the MCP server first attempts to run Stata's `/Register` step automatically. If `stata_detect` still reports `backend="pystata"` even though Stata is installed, register Stata Automation COM once from an elevated PowerShell:
 
 ```powershell
 Start-Process -FilePath "<path-to-StataMP-64.exe>" -ArgumentList "/Register" -Verb RunAs -Wait
 ```
 
 Most users should not need to set `STATA_PATH`. Use it only for unusual installations that automatic discovery cannot find.
+
+By default, runtime files are written to:
+
+```text
+<codex-working-directory>/.stata-fix
+```
+
+Set `STATA_FIX_WORKDIR` only if you need to override that location.
 
 ## Stata Discovery
 
@@ -141,7 +150,7 @@ The GUI backend is used only after the user explicitly asks to control a manuall
 
 `stata_detect`
 
-Detects the local Stata installation and backend that the server will use.
+Detects the local Stata installation, backend, and runtime directory that the server will use.
 
 `stata_run`
 

@@ -193,3 +193,18 @@ def test_com_runner_returns_setup_error_when_pywin32_missing(monkeypatch, tmp_pa
 
     assert result.rc == 1
     assert "pywin32" in result.error
+
+
+def test_com_runner_default_log_path_uses_workspace(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    install = StataInstallation(
+        binary=tmp_path / "StataMP-64.exe",
+        root=tmp_path,
+        edition="mp",
+        diagnostics="",
+    )
+
+    path = ComStataRunner(install)._default_log_path()
+
+    assert path.parent == tmp_path / ".stata-fix"
+    assert path.name.startswith("stata-fix-com-")

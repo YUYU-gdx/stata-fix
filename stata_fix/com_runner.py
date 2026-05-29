@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import tempfile
 import time
 import uuid
 from dataclasses import dataclass
@@ -9,6 +8,7 @@ from pathlib import Path
 from typing import Callable
 
 from .discovery import StataInstallation
+from .paths import runtime_path
 from .pystata_runner import StataRunResult
 
 
@@ -137,4 +137,4 @@ class ComStataRunner:
             pass
 
     def _default_log_path(self) -> Path:
-        return Path(tempfile.gettempdir()) / f"stata-fix-{uuid.uuid4().hex}.log"
+        return runtime_path("stata-fix-com", ".log")

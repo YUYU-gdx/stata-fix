@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import tempfile
 import time
 import uuid
 import re
@@ -10,6 +9,7 @@ from typing import Callable, Protocol
 
 from .com_runner import ComBackendStatus
 from .discovery import StataInstallation
+from .paths import runtime_path
 from .pystata_runner import StataRunResult
 
 
@@ -161,13 +161,13 @@ class GuiStataRunner:
         return log_path.read_text(encoding="utf-8", errors="replace")
 
     def _default_log_path(self) -> Path:
-        return Path(tempfile.gettempdir()) / f"stata-fix-gui-{uuid.uuid4().hex}.log"
+        return runtime_path("stata-fix-gui", ".log")
 
     def _default_code_path(self) -> Path:
-        return Path(tempfile.gettempdir()) / f"stata-fix-gui-code-{uuid.uuid4().hex}.do"
+        return runtime_path("stata-fix-gui-code", ".do")
 
     def _default_wrapper_path(self) -> Path:
-        return Path(tempfile.gettempdir()) / f"stata-fix-gui-wrapper-{uuid.uuid4().hex}.do"
+        return runtime_path("stata-fix-gui-wrapper", ".do")
 
 
 def _process_name(pid: int) -> str:

@@ -91,3 +91,13 @@ def test_gui_runner_inspects_uia_visible_content(tmp_path):
         "title": "Stata/MP 18.0",
         "elements": [{"name": "命令窗口", "text": ""}],
     }
+
+
+def test_gui_runner_default_paths_use_workspace(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    install = StataInstallation(binary=tmp_path / "StataMP-64.exe", root=tmp_path, edition="mp", diagnostics="")
+    runner = GuiStataRunner(install, hwnd=100, automation=FakeGuiAutomation())
+
+    assert runner._default_log_path().parent == tmp_path / ".stata-fix"
+    assert runner._default_code_path().parent == tmp_path / ".stata-fix"
+    assert runner._default_wrapper_path().parent == tmp_path / ".stata-fix"

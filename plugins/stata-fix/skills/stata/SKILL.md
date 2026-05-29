@@ -21,7 +21,9 @@ Prefer the local MCP server tools exposed by this repository:
 
 Do not ask the user to create temporary do-files or manually configure Stata paths before trying the MCP. The MCP is responsible for local discovery.
 
-On Windows, expect the default backend to be `com` when Stata Automation COM and `pywin32` are available. This backend creates a dedicated Stata GUI instance for the MCP server and does not attach to a Stata window the user already has open. It also wraps each run in a temporary Stata log so the command is visible in the GUI and the log text is returned to Codex.
+On Windows, expect the default backend to be `com` when Stata Automation COM and `pywin32` are available. If Stata is found but COM is not registered, the MCP attempts Stata's `/Register` step automatically before falling back. This backend creates a dedicated Stata GUI instance for the MCP server and does not attach to a Stata window the user already has open. It also wraps each run in a temporary Stata log so the command is visible in the GUI and the log text is returned to Codex.
+
+Runtime do-files and logs are written under the MCP process working directory in `.stata-fix` by default. `stata_detect` reports this as `runtime_dir`.
 
 Priority rule: default to COM. Use the GUI backend only after the user explicitly asks to control a manually opened Stata window. Do not switch to GUI merely because a Stata GUI is visible.
 
@@ -108,8 +110,9 @@ If `stata_detect` returns `found=false` or `stata_run` returns a nonzero `rc`:
 
 1. Show the diagnostic text returned by the MCP.
 2. Explain that Stata must be installed locally and licensed on the user's machine.
-3. Suggest adding Stata's install directory to the system `PATH` only if automatic install-root discovery failed.
-4. Mention `STATA_PATH` only as a last-resort override for unusual installations.
+3. If Windows reports `backend="pystata"` even though Stata is installed, explain that automatic COM registration was attempted and suggest running Stata `/Register` from elevated PowerShell.
+4. Suggest adding Stata's install directory to the system `PATH` only if automatic install-root discovery failed.
+5. Mention `STATA_PATH` only as a last-resort override for unusual installations.
 
 ## Output Handling
 

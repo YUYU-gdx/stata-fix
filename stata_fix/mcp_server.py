@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import subprocess
 from functools import lru_cache
 
 from mcp.server.fastmcp import FastMCP
@@ -8,6 +9,7 @@ from mcp.server.fastmcp import FastMCP
 from .com_runner import ComStataRunner, is_com_available
 from .discovery import discover_stata
 from .gui_runner import GuiStataRunner, Win32GuiAutomation
+from .paths import runtime_dir
 from .pystata_runner import PyStataRunner
 
 
@@ -23,9 +25,29 @@ def get_runner():
 
 
 def create_runner(installation, *, attach_existing: bool = False):
-    if os.name == "nt" and is_com_available():
-        return ComStataRunner(installation, attach_existing=attach_existing)
+    if os.name == "nt":
+        if is_com_available():
+            return ComStataRunner(installation, attach_existing=attach_existing)
+        if register_stata_com(installation) and is_com_available():
+            return ComStataRunner(installation, attach_existing=attach_existing)
     return PyStataRunner(installation)
+
+
+def register_stata_com(installation) -> bool:
+    if os.name != "nt" or installation.binary is None:
+        return False
+
+    try:
+        completed = subprocess.run(
+            [str(installation.binary), "/Register"],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=60,
+        )
+    except Exception:
+        return False
+    return completed.returncode == 0
 
 
 @mcp.tool(structured_output=True)
@@ -39,6 +61,7 @@ async def stata_detect() -> dict[str, object]:
         "root": str(installation.root) if installation.root is not None else None,
         "edition": installation.edition,
         "backend": getattr(runner, "backend", "pystata"),
+        "runtime_dir": str(runtime_dir()),
         "diagnostics": installation.diagnostics,
     }
 
