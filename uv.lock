@@ -645,7 +645,7 @@ wheels = [
 
 [[package]]
 name = "stata-fix"
-version = "0.1.3"
+version = "0.1.4"
 source = { editable = "." }
 dependencies = [
     { name = "mcp" },

@@ -11,7 +11,8 @@ def test_codex_plugin_manifest_is_valid_json():
 
     assert manifest["name"] == "stata-fix"
     assert manifest["mcp"] == ".mcp.json"
-    assert manifest["skills"] == ["skills/stata"]
+    assert manifest["skills"] == "skills"
+    assert manifest["author"] == {"name": "stata-fix contributors"}
 
 
 def test_codex_plugin_mcp_launches_published_console_script():
